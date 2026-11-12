@@ -1,22 +1,26 @@
 const multer = require('multer');
 const { CloudinaryStorage } = require('multer-storage-cloudinary');
-const cloudinary = require('cloudinary').v2;
-require('dotenv').config();
+const cloudinary = require('../config/cloudinary');
 
-cloudinary.config({
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET
-});
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5 MB
 
 const storage = new CloudinaryStorage({
   cloudinary,
-  params: async (req, file) => ({
+  params: async () => ({
     folder: 'social_media_posts',
-    resource_type: 'image' // Automatically infers image type
-    // No 'allowed_formats' => all image  formats are accepted
-  })
+    resource_type: 'image',
+  }),
 });
 
-const upload = multer({ storage });
+const upload = multer({
+  storage,
+  limits: { fileSize: MAX_FILE_SIZE },
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) return cb(null, true);
+    const err = new Error('Only image files are allowed');
+    err.status = 400;
+    return cb(err);
+  },
+});
+
 module.exports = upload;

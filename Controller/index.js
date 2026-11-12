@@ -1,13 +1,9 @@
-const userController = require('./User');
-const postController = require('./Post');
-const commentController = require('./Comment');
-const likeController = require('./Like');
-const friendRequestController = require('./FriendRequest');
-
 module.exports = {
-  userController,
-  postController,
-  commentController,
-  likeController,
-  friendRequestController
+  userController: require('./User'),
+  profileController: require('./ProfileController'),
+  postController: require('./Post'),
+  commentController: require('./Comment'),
+  likeController: require('./Like'),
+  friendRequestController: require('./FriendRequest'),
+  messageController: require('./Message'),
 };

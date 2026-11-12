@@ -1,26 +1,20 @@
 const jwt = require('jsonwebtoken');
-require('dotenv').config();
+const { jwtSecret } = require('../config/env');
 
-module.exports = (req, res, next) => {
-  const authHeader = req.headers.authorization;
+module.exports = function auth(req, res, next) {
+  const header = req.headers.authorization || '';
+  const [scheme, token] = header.split(' ');
 
-  if (!authHeader || !authHeader.startsWith('Bearer ')) {
+  if (scheme !== 'Bearer' || !token) {
     return res.status(401).json({ message: 'Access denied. No token provided.' });
   }
 
-  const token = authHeader.split(' ')[1];
-
   try {
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // ✅ Ensure both `id` and `userId` are available
-    req.user = {
-      id: decoded.userId,      // ✅ Legacy compatibility
-      userId: decoded.userId,  // ✅ New usage
-      // email: decoded.email
-    };
-
-    next();
+    const decoded = jwt.verify(token, jwtSecret);
+    const userId = Number(decoded.userId);
+    // Both `id` and `userId` are exposed for backward compatibility.
+    req.user = { id: userId, userId };
+    return next();
   } catch (err) {
     return res.status(401).json({ message: 'Invalid or expired token.' });
   }

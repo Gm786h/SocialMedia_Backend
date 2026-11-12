@@ -1,13 +1,11 @@
 const express = require('express');
+const auth = require('../Middleware/auth');
+const { likeController } = require('../Controller');
+
 const router = express.Router();
-const likeController = require('../Controller/Like');
-const authenticate = require('../Middleware/auth');
 
-// ✅ Register static routes first
-router.get('/check/:postId', authenticate, likeController.checkIfLiked);
-router.post('/like', authenticate, likeController.likePost);
-
-// ✅ This is the missing route
+router.get('/check/:postId', auth, likeController.checkIfLiked);
+router.post('/like', auth, likeController.likePost);
 router.get('/:postId', likeController.getLikesByPost);
 
 module.exports = router;

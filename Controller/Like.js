@@ -1,63 +1,45 @@
-const models = require('../Model/index');
+const models = require('../Model');
 
-// Like a post
-exports.likePost = async (req, res) => {
-  const userId = req.user.userId;
-  const { postId } = req.body;
-
+// Toggle a like on a post.
+exports.likePost = async (req, res, next) => {
   try {
-    const existingLike = await models.like.findOne({ where: { userId, postId } });
+    const userId = req.user.userId;
+    const { postId } = req.body;
+    if (!postId) return res.status(400).json({ message: 'postId is required' });
 
+    const post = await models.post.findByPk(postId);
+    if (!post) return res.status(404).json({ message: 'Post not found' });
+
+    const existingLike = await models.like.findOne({ where: { userId, postId } });
     if (existingLike) {
-      // 🔁 Unlike it
       await existingLike.destroy();
       return res.status(200).json({ message: 'Post unliked' });
     }
 
-    // ✅ Like it
     const newLike = await models.like.create({ userId, postId });
-    res.status(201).json({ message: 'Post liked', like: newLike });
-
+    return res.status(201).json({ message: 'Post liked', like: newLike });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error toggling like' });
+    return next(err);
   }
 };
 
-
-// Get all likes for a post
-exports.getLikesByPost = async (req, res) => {
-  const { postId } = req.params;
-
+exports.getLikesByPost = async (req, res, next) => {
   try {
     const likes = await models.like.findAll({
-      where: { postId },
-      include: { model: models.user, attributes: ['id', 'name'] }
+      where: { postId: req.params.postId },
+      include: { model: models.user, attributes: ['id', 'name'] },
     });
-
-    res.json(likes);
+    return res.json(likes);
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Error fetching likes' });
-  } 
-};
-
-// Check if current user liked the post
-exports.checkIfLiked = async (req, res) => {
-  const userId = req.user.id;
-  const postId = req.params.postId;
-
-  try {
-    const like = await models.like.findOne({ where: { userId, postId } });
-
-    if (like) {
-      return res.status(200).json({ liked: true });
-    } else {
-      return res.status(200).json({ liked: false });
-    }
-  } catch (err) {
-    console.error('Error checking like:', err);
-    res.status(500).json({ message: 'Internal server error' });
+    return next(err);
   }
 };
 
+exports.checkIfLiked = async (req, res, next) => {
+  try {
+    const like = await models.like.findOne({ where: { userId: req.user.userId, postId: req.params.postId } });
+    return res.json({ liked: !!like });
+  } catch (err) {
+    return next(err);
+  }
+};

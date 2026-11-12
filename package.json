@@ -1,23 +1,36 @@
 {
-  "name": "myapp",
-  "version": "0.0.0",
+  "name": "socialmedia-backend",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "start": "node ./bin/www"
+    "start": "node ./bin/www",
+    "dev": "nodemon ./bin/www",
+    "db:sync": "node scripts/sync-db.js",
+    "test": "node --test test/*.test.js"
   },
   "dependencies": {
     "bcrypt": "^6.0.0",
     "cloudinary": "^1.41.3",
-    "cookie-parser": "~1.4.4",
     "cors": "^2.8.5",
-    "debug": "~2.6.9",
     "dotenv": "^17.0.1",
-    "express": "~4.16.1",
+    "express": "^4.22.3",
+    "helmet": "^8.3.0",
     "jsonwebtoken": "^9.0.2",
-    "morgan": "~1.9.1",
+    "morgan": "^1.12.1",
     "multer": "^2.0.1",
     "multer-storage-cloudinary": "^4.0.0",
-    "nodemon": "^3.1.10",
+    "mysql2": "^3.24.6",
     "sequelize": "^6.37.7"
-  }
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.14",
+    "sqlite3": "^6.0.1",
+    "supertest": "^7.3.2"
+  },
+  "description": "REST API for a social media platform: auth, posts, comments, likes, friends and messaging",
+  "main": "app.js",
+  "engines": {
+    "node": ">=18"
+  },
+  "license": "UNLICENSED"
 }

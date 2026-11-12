@@ -1,6 +1,9 @@
 node_modules/
 .env
-.DS_Store
-logs
+.env.*
+!.env.example
+dist/
+coverage/
 *.log
-
+.DS_Store
+*.sqlite

@@ -1,13 +1,10 @@
 const express = require('express');
+const auth = require('../Middleware/auth');
+const { messageController } = require('../Controller');
+
 const router = express.Router();
-const messageController = require('../Controller/Message');
-const authenticate = require('../Middleware/auth');
 
-// Send a message
-router.post('/send', authenticate, messageController.sendMessage);
-
-// Get chat between current user and another user
-router.get('/:otherUserId', authenticate, messageController.getChatWithUser);
+router.post('/send', auth, messageController.sendMessage);
+router.get('/:otherUserId', auth, messageController.getChatWithUser);
 
 module.exports = router;
-    
